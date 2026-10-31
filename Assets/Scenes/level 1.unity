@@ -992,6 +992,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 82c9a33793b0e28449c9703187a98478, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2080546562}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 82c9a33793b0e28449c9703187a98478, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2080546563}
   m_SourcePrefab: {fileID: 100100000, guid: 82c9a33793b0e28449c9703187a98478, type: 3}
 --- !u!1 &438810564
 GameObject:
@@ -2973,6 +2976,20 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 5, z: 8.96}
   m_Center: {x: 0, y: 0, z: 1.57}
+--- !u!114 &2080546563
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2080546559}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 565ce5c15456a004aa7f0466b6aa12bb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::sceneloadergame
+  objectToWatch: {fileID: 2080546559}
+  sceneName: level 2
 --- !u!1 &2101743398
 GameObject:
   m_ObjectHideFlags: 0
