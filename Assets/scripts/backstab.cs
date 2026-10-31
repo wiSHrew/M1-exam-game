@@ -7,15 +7,10 @@ public class backstab : MonoBehaviour, IInteractable
     private const float BackstabCanvasDuration = 2f;
     private const float FallDuration = 0.4f;
 
-    [SerializeField] private Vector2 xBounds = new Vector2(-46f, 48f);
-    [SerializeField] private Vector2 zBounds = new Vector2(-48f, 49f);
-    [SerializeField, Min(0f)] private float runSpeed = 4f;
-    [SerializeField, Min(0f)] private float turnSpeed = 540f;
     [SerializeField, Min(0f)] private float backstabRange = 2.5f;
-    [SerializeField, Range(-1f, 1f)] private float backstabAngleThreshold = -0.35f;
+    [SerializeField, Range(-1f, 1f)] private float backstabAngleThreshold = -1f;
     [SerializeField] private GameObject backstabCanvas;
 
-    private Vector3 destination;
     private Transform playerTransform;
     private Image firstBackstabIndicator;
     private Image secondBackstabIndicator;
@@ -63,8 +58,6 @@ public class backstab : MonoBehaviour, IInteractable
         {
             playerTransform = player.transform;
         }
-
-        ChooseDestination();
     }
 
     private Image FindIndicator(string indicatorName)
@@ -85,27 +78,6 @@ public class backstab : MonoBehaviour, IInteractable
         if (defeated)
         {
             return;
-        }
-
-        Vector3 direction = destination - transform.position;
-        direction.y = 0f;
-
-        if (direction.sqrMagnitude <= 0.01f)
-        {
-            ChooseDestination();
-        }
-        else
-        {
-            Quaternion targetRotation = Quaternion.LookRotation(direction.normalized);
-            transform.rotation = Quaternion.RotateTowards(
-                transform.rotation,
-                targetRotation,
-                turnSpeed * Time.deltaTime);
-
-            transform.position = Vector3.MoveTowards(
-                transform.position,
-                destination,
-                runSpeed * Time.deltaTime);
         }
 
         UpdateBackstabIndicators();
@@ -142,14 +114,6 @@ public class backstab : MonoBehaviour, IInteractable
             Vector3.Dot(enemyForward, directionToPlayer.normalized) <= backstabAngleThreshold;
     }
 
-    private void ChooseDestination()
-    {
-        destination = new Vector3(
-            Random.Range(xBounds.x, xBounds.y),
-            transform.position.y,
-            Random.Range(zBounds.x, zBounds.y));
-    }
-
     public void Interact(GameObject interactor)
     {
         if (defeated || interactor == null)
@@ -176,6 +140,19 @@ public class backstab : MonoBehaviour, IInteractable
         }
 
         StartCoroutine(FallOverAndRemoveNpc());
+        DisableAttachedScripts();
+    }
+
+    private void DisableAttachedScripts()
+    {
+        MonoBehaviour[] scripts = GetComponents<MonoBehaviour>();
+        foreach (MonoBehaviour script in scripts)
+        {
+            if (script != null && script.enabled)
+            {
+                script.enabled = false;
+            }
+        }
     }
 
     private IEnumerator FallOverAndRemoveNpc()

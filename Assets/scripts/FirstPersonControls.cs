@@ -11,14 +11,22 @@ public class FirstPersonControls : MonoBehaviour
     [SerializeField] private float gravity = -9.81f;
     [SerializeField, Min(0f)] private float mouseSensitivity = 0.1f;
     [SerializeField, Range(0f, 89f)] private float maxLookAngle = 85f;
+    [SerializeField] private Key sizeScalerToggleKey = Key.Y;
 
     private CharacterController characterController;
+    private sizescaler sizeScaler;
     private float verticalVelocity;
     private float cameraPitch;
 
     private void Awake()
     {
         characterController = GetComponent<CharacterController>();
+        sizeScaler = GetComponent<sizescaler>();
+
+        if (sizeScaler == null)
+        {
+            Debug.LogError("A sizescaler component is required on the player GameObject.", this);
+        }
 
         if (playerCamera == null)
         {
@@ -57,6 +65,11 @@ public class FirstPersonControls : MonoBehaviour
 
         if (keyboard != null)
         {
+            if (sizeScaler != null && keyboard[sizeScalerToggleKey].wasPressedThisFrame)
+            {
+                sizeScaler.enabled = !sizeScaler.enabled;
+            }
+
             moveInput.x = (keyboard.dKey.isPressed || keyboard.rightArrowKey.isPressed ? 1f : 0f)
                 - (keyboard.aKey.isPressed || keyboard.leftArrowKey.isPressed ? 1f : 0f);
             moveInput.y = (keyboard.wKey.isPressed || keyboard.upArrowKey.isPressed ? 1f : 0f)
