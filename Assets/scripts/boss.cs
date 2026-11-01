@@ -61,7 +61,7 @@ public class boss : MonoBehaviour
 
         if (remainingCount == 0)
         {
-            Destroy(gameObject);
+            gameObject.SetActive(false);
         }
     }
 

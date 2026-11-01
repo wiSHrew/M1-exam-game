@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class backstab : MonoBehaviour, IInteractable
 {
@@ -10,11 +11,11 @@ public class backstab : MonoBehaviour, IInteractable
     [SerializeField, Min(0f)] private float backstabRange = 2.5f;
     [SerializeField, Range(-1f, 1f)] private float backstabAngleThreshold = -1f;
     [SerializeField] private GameObject backstabCanvas;
+    [SerializeField] private TMP_Text backstabMessage;
 
     private Transform playerTransform;
     private Image firstBackstabIndicator;
     private Image secondBackstabIndicator;
-    private GameObject backstabMessage;
     private Color firstIndicatorDefaultColor;
     private Color secondIndicatorDefaultColor;
     private bool defeated;
@@ -40,13 +41,11 @@ public class backstab : MonoBehaviour, IInteractable
             {
                 secondIndicatorDefaultColor = secondBackstabIndicator.color;
             }
+        }
 
-            Transform messageTransform = backstabCanvas.transform.Find("Text (TMP)");
-            if (messageTransform != null)
-            {
-                backstabMessage = messageTransform.gameObject;
-                backstabMessage.SetActive(false);
-            }
+        if (backstabMessage != null)
+        {
+            backstabMessage.gameObject.SetActive(false);
         }
 
         playerinteraction player = FindAnyObjectByType<playerinteraction>();
@@ -132,11 +131,11 @@ public class backstab : MonoBehaviour, IInteractable
 
         if (backstabMessage == null)
         {
-            Debug.LogError("The canvas must have a Text (TMP) child for the backstab message.", this);
+            Debug.LogError("Assign a TextMeshPro component for the backstab message.", this);
         }
         else
         {
-            backstabMessage.SetActive(true);
+            backstabMessage.gameObject.SetActive(true);
         }
 
         StartCoroutine(FallOverAndRemoveNpc());
@@ -174,7 +173,7 @@ public class backstab : MonoBehaviour, IInteractable
 
         if (backstabMessage != null)
         {
-            backstabMessage.SetActive(false);
+            backstabMessage.gameObject.SetActive(false);
         }
 
         Destroy(gameObject);

@@ -461,7 +461,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 642663764614154775, guid: 7782b9d2fa2d98e4d9e00b45b921ba6d, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 222
+      value: 491.9
+      objectReference: {fileID: 0}
+    - target: {fileID: 5415310107882534811, guid: 7782b9d2fa2d98e4d9e00b45b921ba6d, type: 3}
+      propertyPath: m_text
+      value: sa
       objectReference: {fileID: 0}
     - target: {fileID: 6663915006888399595, guid: 7782b9d2fa2d98e4d9e00b45b921ba6d, type: 3}
       propertyPath: m_Name
@@ -802,7 +806,7 @@ MonoBehaviour:
   target: {fileID: 246249401163571215}
   sphereSpeed: 10
   counterDisplay: {fileID: 177029089}
-  startingCount: 100
+  startingCount: 1
 --- !u!65 &2084631954
 BoxCollider:
   m_ObjectHideFlags: 0
