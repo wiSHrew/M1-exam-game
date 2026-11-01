@@ -8,6 +8,9 @@ public class sizescaler : MonoBehaviour
 
     private Vector3 initialScale;
     private float scaleMultiplier = 1f;
+    private bool scalingEnabled;
+
+    public float CurrentScaleMultiplier => scaleMultiplier;
 
     private void OnEnable()
     {
@@ -17,6 +20,11 @@ public class sizescaler : MonoBehaviour
 
     private void Update()
     {
+        if (!scalingEnabled)
+        {
+            return;
+        }
+
         float scroll = Input.mouseScrollDelta.y;
         if (Mathf.Approximately(scroll, 0f))
         {
@@ -24,9 +32,14 @@ public class sizescaler : MonoBehaviour
         }
 
         scaleMultiplier = Mathf.Clamp(
-            scaleMultiplier * (1f - scroll * scrollSensitivity),
+            scaleMultiplier * (1f + scroll * scrollSensitivity),
             minimumScale,
             maximumScale);
         transform.localScale = initialScale * scaleMultiplier;
+    }
+
+    public void SetScalingEnabled(bool enabled)
+    {
+        scalingEnabled = enabled;
     }
 }

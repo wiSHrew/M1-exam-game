@@ -1,7 +1,8 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using TMPro;
 
-[RequireComponent(typeof(CharacterController))]
+[RequireComponent(typeof(CharacterController), typeof(sizescaler))]
 public class FirstPersonControls : MonoBehaviour
 {
     [SerializeField] private Transform playerCamera;
@@ -11,12 +12,21 @@ public class FirstPersonControls : MonoBehaviour
     [SerializeField] private float gravity = -9.81f;
     [SerializeField, Min(0f)] private float mouseSensitivity = 0.1f;
     [SerializeField, Range(0f, 89f)] private float maxLookAngle = 85f;
-    [SerializeField] private Key sizeScalerToggleKey = Key.Y;
+    [SerializeField] private Key sizeScalerHoldKey = Key.Y;
+    [SerializeField] private Key speedScalerHoldKey = Key.K;
+    [SerializeField, Min(0f)] private float speedScrollSensitivity = 0.1f;
+    [SerializeField, Min(0.01f)] private float minimumSpeedMultiplier = 0.25f;
+    [SerializeField, Min(0.01f)] private float maximumSpeedMultiplier = 3f;
+    [SerializeField] private float fallRecoveryThreshold = -10f;
+    [SerializeField] private float fallRecoveryHeight = 10f;
+    [SerializeField] private TMP_Text speedDisplay;
+    [SerializeField] private TMP_Text sizeDisplay;
 
     private CharacterController characterController;
     private sizescaler sizeScaler;
     private float verticalVelocity;
     private float cameraPitch;
+    private float speedMultiplier = 1f;
 
     private void Awake()
     {
@@ -26,6 +36,16 @@ public class FirstPersonControls : MonoBehaviour
         if (sizeScaler == null)
         {
             Debug.LogError("A sizescaler component is required on the player GameObject.", this);
+        }
+
+        if (speedDisplay == null)
+        {
+            Debug.LogError("Assign a TextMeshPro component to the speed display field.", this);
+        }
+
+        if (sizeDisplay == null)
+        {
+            Debug.LogError("Assign a TextMeshPro component to the size display field.", this);
         }
 
         if (playerCamera == null)
@@ -58,6 +78,16 @@ public class FirstPersonControls : MonoBehaviour
 
     private void Update()
     {
+        if (transform.position.y < fallRecoveryThreshold)
+        {
+            characterController.enabled = false;
+            Vector3 position = transform.position;
+            position.y = fallRecoveryHeight;
+            transform.position = position;
+            characterController.enabled = true;
+            verticalVelocity = 0f;
+        }
+
         Keyboard keyboard = Keyboard.current;
         Vector2 moveInput = Vector2.zero;
         bool sprinting = false;
@@ -65,17 +95,30 @@ public class FirstPersonControls : MonoBehaviour
 
         if (keyboard != null)
         {
-            if (sizeScaler != null && keyboard[sizeScalerToggleKey].wasPressedThisFrame)
-            {
-                sizeScaler.enabled = !sizeScaler.enabled;
-            }
-
             moveInput.x = (keyboard.dKey.isPressed || keyboard.rightArrowKey.isPressed ? 1f : 0f)
                 - (keyboard.aKey.isPressed || keyboard.leftArrowKey.isPressed ? 1f : 0f);
             moveInput.y = (keyboard.wKey.isPressed || keyboard.upArrowKey.isPressed ? 1f : 0f)
                 - (keyboard.sKey.isPressed || keyboard.downArrowKey.isPressed ? 1f : 0f);
             sprinting = keyboard.leftShiftKey.isPressed || keyboard.rightShiftKey.isPressed;
             jumpPressed = keyboard.spaceKey.wasPressedThisFrame;
+        }
+
+        if (sizeScaler != null)
+        {
+            sizeScaler.SetScalingEnabled(
+                keyboard != null && keyboard[sizeScalerHoldKey].isPressed);
+        }
+
+        if (keyboard != null && keyboard[speedScalerHoldKey].isPressed)
+        {
+            float scroll = Input.mouseScrollDelta.y;
+            if (!Mathf.Approximately(scroll, 0f))
+            {
+                speedMultiplier = Mathf.Clamp(
+                    speedMultiplier * (1f + scroll * speedScrollSensitivity),
+                    minimumSpeedMultiplier,
+                    maximumSpeedMultiplier);
+            }
         }
 
         Vector2 lookInput = Mouse.current != null
@@ -100,9 +143,19 @@ public class FirstPersonControls : MonoBehaviour
 
         Vector3 movement = transform.right * moveInput.x + transform.forward * moveInput.y;
         movement = Vector3.ClampMagnitude(movement, 1f);
-        float speed = sprinting ? sprintSpeed : walkSpeed;
+        float speed = (sprinting ? sprintSpeed : walkSpeed) * speedMultiplier;
 
         characterController.Move(
             (movement * speed + Vector3.up * verticalVelocity) * Time.deltaTime);
+
+        if (speedDisplay != null)
+        {
+            speedDisplay.SetText("Speed: {0:0.0}", speed);
+        }
+
+        if (sizeDisplay != null && sizeScaler != null)
+        {
+            sizeDisplay.SetText("Size: {0:0.0}x", sizeScaler.CurrentScaleMultiplier);
+        }
     }
 }
